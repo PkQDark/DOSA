@@ -12,7 +12,6 @@ from django.db.models import Sum
 from pytz import timezone
 import string
 from .celery import app
-#new good news
 
 lock = threading.Lock()
 kiev = timezone('Europe/Kiev')
