@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'local_admin',
     'company_admin',
     'users',
+    'serv',
 
 ]
 
@@ -61,7 +62,7 @@ ROOT_URLCONF = 'DOSA_sim.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'],
+        'DIRS': ['/opt/DOSA_sim/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -83,9 +84,9 @@ WSGI_APPLICATION = 'DOSA_sim.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'password',
+        'NAME': 'dosa',
+        'USER': 'dosa',
+        'PASSWORD': 'ohKol9negheizipieg',
         'HOST': 'localhost',
         'PORT': '5432',
     }
