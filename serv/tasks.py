@@ -12,7 +12,7 @@ from django.db.models import Sum
 from pytz import timezone
 import string
 from .celery import app
-#13456
+#qwq45qqwr
 lock = threading.Lock()
 kiev = timezone('Europe/Kiev')
 logger = logging.getLogger('main')
