@@ -1,6 +1,7 @@
 from django.shortcuts import render, HttpResponse, HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from openpyxl import Workbook
 from datetime import datetime
@@ -56,8 +57,18 @@ def dosing(request):
             ws.append(xls_mas)
         wb.save(response)
         return response
+    # Пагинация
+    db_paginator = Paginator(db, 25)
+    db_page = request.GET.get('db_page')
+    try:
+        downdosed = db_paginator.page(db_page)
+    except PageNotAnInteger:
+        downdosed = db_paginator.page(1)
+    except EmptyPage:
+        downdosed = db_paginator.page(db_paginator.num_pages)
     return render(request, 'users/user_dosing.html',
-                  {'db': db, 'date_filter': date_filter, 'company': company.name, 'cur_user': request.user.username})
+                  {'db': downdosed, 'date_filter': date_filter, 'company': company.name,
+                   'cur_user': request.user.username})
 
 
 # БД ключей
@@ -128,8 +139,18 @@ def fuel_info(request, fuel_id):
             ws.append(xls_mas)
         wb.save(response)
         return response
+    # Пагинация
+    db_paginator = Paginator(db, 25)
+    db_page = request.GET.get('db_page')
+    try:
+        downdosed = db_paginator.page(db_page)
+    except PageNotAnInteger:
+        downdosed = db_paginator.page(1)
+    except EmptyPage:
+        downdosed = db_paginator.page(db_paginator.num_pages)
     return render(request, 'users/user_fuel_info.html',
-                  {'db': db, 'date_filter': date_filter, 'cur_user': request.user.username, 'company': company.name})
+                  {'db': downdosed, 'date_filter': date_filter, 'cur_user': request.user.username,
+                   'company': company.name})
 
 
 # Перечень резервуаров
@@ -249,6 +270,24 @@ def cistern_info(request, cist_id):
             ws.append(xls_mas)
         wb.save(response)
         return response
+    # Пагинация
+    db_paginator = Paginator(downdosed, 25)
+    db_page = request.GET.get('db_page')
+    try:
+        db = db_paginator.page(db_page)
+    except PageNotAnInteger:
+        db = db_paginator.page(1)
+    except EmptyPage:
+        db = db_paginator.page(db_paginator.num_pages)
+
+    ud_paginator = Paginator(updosed, 25)
+    ud_page = request.GET.get('ud_page')
+    try:
+        ud = ud_paginator.page(ud_page)
+    except PageNotAnInteger:
+        ud = ud_paginator.page(1)
+    except EmptyPage:
+        ud = ud_paginator.page(ud_paginator.num_pages)
     return render(request, 'users/user_cistern_info.html',
-                  {'cur_user': request.user.username, 'nav': nav, 'date_filter': date_filter, 'downdosed': downdosed,
-                   'updosed': updosed, 'company': company.name})
+                  {'cur_user': request.user.username, 'nav': nav, 'date_filter': date_filter, 'downdosed': db,
+                   'updosed': ud, 'company': company.name})

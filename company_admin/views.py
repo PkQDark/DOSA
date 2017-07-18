@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.forms.formsets import formset_factory
 from django.db import IntegrityError
 from django.db.models import Sum
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from datetime import datetime
 from pytz import timezone
@@ -70,11 +71,11 @@ def dosing(request):
             start_date = kiev.localize(datetime.combine(date_filter.cleaned_data['start_date'], datetime.min.time()))
         if date_filter.cleaned_data['end_date']:
             end_date = kiev.localize(datetime.combine(date_filter.cleaned_data['end_date'], datetime.max.time()))
-    db = Database.objects.filter(dev__company=company, date_time__gte=start_date, date_time__lte=end_date,
-                                 user__name__icontains=filter_name, user__car__icontains=filter_car,
-                                 dev__cistern__fuel__name__icontains=filter_fuel, delete=False)
+    downdosed = Database.objects.filter(dev__company=company, date_time__gte=start_date, date_time__lte=end_date,
+                                        user__name__icontains=filter_name, user__car__icontains=filter_car,
+                                        dev__cistern__fuel__name__icontains=filter_fuel, delete=False)
     if request.GET.get('delete'):
-        db.update(delete=True)
+        downdosed.update(delete=True)
     if request.GET.get('to_xls'):
         response = HttpResponse(content_type='application/vnd.ms-excel')
         response['Content-Disposition'] = 'attachment; filename="loads_report.xls"'
@@ -82,7 +83,7 @@ def dosing(request):
         ws = wb.active
         xls_mas = ['Имя', 'Машина', 'Ключ', 'Отгружено', 'Дата', 'Цистерна', 'Тип жидкости']
         ws.append(xls_mas)
-        for entry in db:
+        for entry in downdosed:
             xls_mas = [entry.user.name, entry.user.car, entry.user.keys, entry.dosed, entry.date_time]
             if entry.dev.cistern:
                 xls_mas.extend([entry.dev.cistern.name, entry.dev.cistern.fuel.name])
@@ -91,6 +92,15 @@ def dosing(request):
             ws.append(xls_mas)
         wb.save(response)
         return response
+    # Пагинация
+    db_paginator = Paginator(downdosed, 25)
+    db_page = request.GET.get('db_page')
+    try:
+        db = db_paginator.page(db_page)
+    except PageNotAnInteger:
+        db = db_paginator.page(1)
+    except EmptyPage:
+        db = db_paginator.page(db_paginator.num_pages)
     return render(request, 'company_admin/admin_dosing.html',
                   {'db': db, 'date_filter': date_filter, 'company': company.name, 'cur_user': request.user.username})
 
@@ -372,8 +382,18 @@ def fuel_info(request, fuel_id):
             ws.append(xls_mas)
         wb.save(response)
         return response
+    # Пагинация
+    db_paginator = Paginator(db, 25)
+    db_page = request.GET.get('db_page')
+    try:
+        downdosed = db_paginator.page(db_page)
+    except PageNotAnInteger:
+        downdosed = db_paginator.page(1)
+    except EmptyPage:
+        downdosed = db_paginator.page(db_paginator.num_pages)
     return render(request, 'company_admin/admin_fuel_info.html',
-                  {'db': db, 'date_filter': date_filter, 'cur_user': request.user.username, 'company': company.name})
+                  {'db': downdosed, 'date_filter': date_filter, 'cur_user': request.user.username,
+                   'company': company.name})
 
 
 # Добавление резервуара
@@ -676,7 +696,34 @@ def cistern_info(request, cist_id):
             ws.append(xls_mas)
         wb.save(response)
         return response
+    # Пагинация
+    db_paginator = Paginator(downdosed, 25)
+    db_page = request.GET.get('db_page')
+    try:
+        db = db_paginator.page(db_page)
+    except PageNotAnInteger:
+        db = db_paginator.page(1)
+    except EmptyPage:
+        db = db_paginator.page(db_paginator.num_pages)
+
+    ud_paginator = Paginator(updosed, 25)
+    ud_page = request.GET.get('ud_page')
+    try:
+        ud = ud_paginator.page(ud_page)
+    except PageNotAnInteger:
+        ud = ud_paginator.page(1)
+    except EmptyPage:
+        ud = ud_paginator.page(ud_paginator.num_pages)
+
+    rec_paginator = Paginator(recovery, 25)
+    rec_page = request.GET.get('rec_page')
+    try:
+        rec = rec_paginator.page(rec_page)
+    except PageNotAnInteger:
+        rec = rec_paginator.page(1)
+    except EmptyPage:
+        rec = rec_paginator.page(rec_paginator.num_pages)
     return render(request, 'company_admin/admin_cistern_info.html',
                   {'cur_user': request.user.username, 'nav': nav, 'date_filter': date_filter,
-                   'add_keys': add_keys_form, 'downdosed': downdosed, 'updosed': updosed, 'recovery': recovery,
+                   'add_keys': add_keys_form, 'downdosed': db, 'updosed': ud, 'recovery': rec,
                    'add_updosed': add_updosed, 'company': company.name})

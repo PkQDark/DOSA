@@ -71,7 +71,7 @@
                     <tbody>
                         {% for entry in db %}
                             <tr>
-                                <td style="text-align: center;">{{ forloop.counter }}</td>
+                                <td style="text-align: center;">{{ forloop.counter0|add:db.start_index }}</td>
                                 <td>
                                     {% if entry.user.name %}
                                         {{ entry.user.name }}
@@ -95,6 +95,56 @@
                         {% endfor %}
                     </tbody>
                 </table>
+                <nav aria-label="Page navigation" style="text-align: center;">
+                    <ul class="pagination">
+                        {% if db.has_previous %}
+                            <li>
+                                <a href="?db_page=1" title="1">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="?db_page={{ db.previous_page_number }}"
+                                   title="{{ db.previous_page_number }}">
+                                    <span aria-hidden="true">&lsaquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="disabled">
+                                <span aria-hidden="true">&laquo;</span>
+                            </li>
+                            <li class="disabled">
+                                <span aria-hidden="true">&lsaquo;</span>
+                            </li>
+                        {% endif %}
+                        <li class="disabled">
+                            <a href="?db_page={{ db.number }}">
+                                {{ db.number }}
+                            </a>
+                        </li>
+                        {% if db.has_next %}
+                            <li>
+                                <a href="?db_page={{ db.next_page_number }}"
+                                   title="{{ db.next_page_number }}">
+                                    <span aria-hidden="true">&rsaquo;</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="?db_page={{ db.paginator.num_pages }}"
+                                   title="{{ db.paginator.num_pages }}">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="disabled">
+                                <span aria-hidden="true">&rsaquo;</span>
+                            </li>
+                            <li class="disabled">
+                                <span aria-hidden="true">&raquo;</span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
             </div>
         </div>
     </div>

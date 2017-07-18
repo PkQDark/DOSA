@@ -76,7 +76,7 @@
                         <tbody>
                             {% for dd in downdosed %}
                                 <tr>
-                                    <td style="text-align: center;">{{ forloop.counter }}</td>
+                                    <td style="text-align: center;">{{ forloop.counter0|add:downdosed.start_index }}</td>
                                     <td>
                                         {% if dd.user.name %}
                                             {{ dd.user.name }}
@@ -95,6 +95,56 @@
                             {% endfor %}
                         </tbody>
                     </table>
+                    <nav aria-label="Page navigation" style="text-align: center;">
+                        <ul class="pagination">
+                            {% if downdosed.has_previous %}
+                                <li>
+                                    <a href="?db_page=1" title="1">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="?db_page={{ downdosed.previous_page_number }}"
+                                       title="{{ downdosed.previous_page_number }}" >
+                                        <span aria-hidden="true">&lsaquo;</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="disabled">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </li>
+                                <li class="disabled">
+                                    <span aria-hidden="true">&lsaquo;</span>
+                                </li>
+                            {% endif %}
+                            <li class="disabled">
+                                <a href="?db_page={{ downdosed.number }}">
+                                    {{ downdosed.number }}
+                                </a>
+                            </li>
+                            {% if downdosed.has_next %}
+                                <li>
+                                    <a href="?db_page={{ downdosed.next_page_number }}"
+                                       title="{{ downdosed.next_page_number }}" >
+                                        <span aria-hidden="true">&rsaquo;</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="?db_page={{ downdosed.paginator.num_pages }}"
+                                       title="{{ downdosed.paginator.num_pages }}" >
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="disabled">
+                                    <span aria-hidden="true">&rsaquo;</span>
+                                </li>
+                                <li class="disabled">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
                 </div>
                 <div class="tab-pane" id="id_updosed">
                     <!-- Таблица загрузок -->
@@ -111,7 +161,7 @@
                         <tbody>
                             {% for entry in updosed %}
                                 <tr>
-                                    <td style="text-align: center;">{{ forloop.counter }}</td>
+                                    <td style="text-align: center;">{{ forloop.counter0|add:updosed.start_index }}</td>
                                     <td style="text-align: center;">{{ entry.date_time|date:'d.m.Y H:i' }}</td>
                                     <td>{{ entry.volume }}</td>
                                     <td>{{ entry.user.user.username }}</td>
@@ -124,6 +174,56 @@
                             {% endfor %}
                         </tbody>
                     </table>
+                    <nav aria-label="Page navigation" style="text-align: center;">
+                        <ul class="pagination">
+                            {% if updosed.has_previous %}
+                                <li>
+                                    <a href="?ud_page=1" title="1">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="?ud_page={{ updosed.previous_page_number }}"
+                                       title="{{ updosed.previous_page_number }}" >
+                                        <span aria-hidden="true">&lsaquo;</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="disabled">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </li>
+                                <li class="disabled">
+                                    <span aria-hidden="true">&lsaquo;</span>
+                                </li>
+                            {% endif %}
+                            <li class="disabled">
+                                <a href="?ud_page={{ updosed.number }}">
+                                    {{ updosed.number }}
+                                </a>
+                            </li>
+                            {% if updosed.has_next %}
+                                <li>
+                                    <a href="?ud_page={{ updosed.next_page_number }}"
+                                       title="{{ updosed.next_page_number }}" >
+                                        <span aria-hidden="true">&rsaquo;</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="?ud_page={{ updosed.paginator.num_pages }}"
+                                       title="{{ updosed.paginator.num_pages }}" >
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="disabled">
+                                    <span aria-hidden="true">&rsaquo;</span>
+                                </li>
+                                <li class="disabled">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
                 </div>
             </div>
         </div>
