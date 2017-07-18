@@ -23,9 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '^53x)5-^9h(y=dj2)+*ar3!38dq*4=pzhk*(1q0y&rdd9vgg0$'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['dosaweb.ml']
 
 
 # Application definition
@@ -132,4 +132,3 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 LOGIN_URL = '/'
-
