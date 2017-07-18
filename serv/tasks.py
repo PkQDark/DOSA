@@ -396,16 +396,16 @@ def handle(sock, client_ip, client_port):
     logger.info('Done.')
 
 
-def serve_forever(PORT):
+def serve_forever(port):
     # создаём слушающий сокет
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # re-use port
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    sock.bind(('',PORT))
+    sock.bind(('', port))
     sock.listen(BACKLOG)
     # слушаем и при получении нового входящего соединения,
     # порождаем нить, которая будет его обрабатывать
-    logger.info('Lis %s:%d...' % ('',PORT))
+    logger.info('Lis %s:%d...' % ('', port))
     while True:
         try:
             connection, (client_ip, client_port) = sock.accept()
@@ -426,7 +426,7 @@ def serve_forever(PORT):
 
 
 @app.task
-def main(PORT):
+def main(port):
     # настраиваем логгинг
     logger.setLevel(logging.DEBUG)
     ch = logging.StreamHandler()
@@ -439,7 +439,7 @@ def main(PORT):
     logger.addHandler(ch)
     logger.info('Run')
     # запускаем сервер
-    serve_forever(PORT)
+    serve_forever(port)
 
 
 p_9090 = 9090

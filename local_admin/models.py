@@ -16,5 +16,6 @@ class CompanyUser(models.Model):
 
 class Device(models.Model):
     dev_id = models.CharField(max_length=40, unique=True)
+    port = models.PositiveIntegerField(max_length=6, default=9090)
     company = models.ForeignKey(Company)
     owned = models.BooleanField(default=False)

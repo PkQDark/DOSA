@@ -436,6 +436,29 @@ def cistern_add(request):
                    'cur_user': request.user.username, 'company': company.name})
 
 
+def send_request_to_data(dev_id, comand, request):
+    sock = socket.socket()
+    dev_port = Device.objects.get(dev_id).port
+    sock.connect(('195.12.59.37', dev_port))
+    n = b'\n'
+    space = b' '
+    dev_id = dev_id.encode()
+    to_send = dev_id + space + comand + n
+    sock.send(to_send)
+    input_text = b''
+    time.sleep(1)
+    while not input_text.endswith(b'\r'):
+        input_text += sock.recv(1024)
+    if input_text == b'yes\r':
+        messages.add_message(request, messages.INFO, 'Устройство найдено, информация вскоре будет обновлена')
+    elif input_text == b'no\r':
+        messages.add_message(request, messages.INFO,
+                             'Устройство не найдено, попробуйте позже, или проверьте соединение')
+    else:
+        messages.add_message(request, messages.INFO, input_text.decode())
+    sock.close()
+
+
 # Перечень резервуаров
 @user_passes_test(lambda u: u.is_active)
 @user_passes_test(lambda u: u.is_staff)
@@ -469,48 +492,14 @@ def cistern_list(request):
         percents.append(perc)
     if request.GET.get('refr_log'):
         dev_id = request.GET.get('refr_log')
-        sock = socket.socket()
-        sock.connect(('195.12.59.37', 9090))
         comand = b'view_log\r'
-        n = b'\n'
-        space = b' '
-        dev_id = dev_id.encode()
-        to_send = dev_id + space + comand + n
-        sock.send(to_send)
-        input_text = b''
-        time.sleep(1)
-        while not input_text.endswith(b'\r'):
-            input_text += sock.recv(1024)
-        if input_text == b'yes\r':
-            messages.add_message(request, messages.INFO, 'Устройство найдено, информация вскоре будет обновлена')
-        elif input_text == b'no\r':
-            messages.add_message(request, messages.INFO, 'Устройство не найдено, попробуйте позже, или проверьте соединение')
-        else:
-            messages.add_message(request, messages.INFO, input_text.decode())
-        sock.close()
-        # Обновление БД отгрузок
+        send_request_to_data(dev_id, comand, request)
+        # Обновление бд отгрузок
     if request.GET.get('refr_keys'):
         dev_id = request.GET.get('refr_keys')
-        sock = socket.socket()
-        sock.connect(('195.12.59.37', 9090))
         comand = b'view_keys\r'
-        n = b'\n'
-        space = b' '
-        dev_id = dev_id.encode()
-        to_send = dev_id + space + comand + n
-        sock.send(to_send)
-        input_text = b''
-        time.sleep(1)
-        while not input_text.endswith(b'\r'):
-            input_text += sock.recv(1024)
-        if input_text == b'yes\r':
-            messages.add_message(request, messages.INFO, 'Устройство найдено, ключи будут вскоре обновлены')
-        elif input_text == b'no\r':
-            messages.add_message(request, messages.INFO, 'Устройство не найдено, попробуйте позже, или поверьте соединение')
-        else:
-            messages.add_message(request, messages.INFO, input_text.decode())
-        sock.close()
-        # Обновление БД отгрузок
+        send_request_to_data(dev_id, comand, request)
+        # Обновление БД ключей
     return render(request, 'company_admin/admin_cisterns.html',
                   {'cists': zip(cists, cur_vols, percents), 'cur_user': request.user.username, 'fuels': fuels,
                    'company': company.name})
@@ -641,7 +630,8 @@ def cistern_info(request, cist_id):
             dev_id = cist.dev.dev_id
             # Запись ключей на устройство
             sock = socket.socket()
-            sock.connect(('195.12.59.37', 9090))
+            dev_port = Device.objects.get(dev_id).port
+            sock.connect(('195.12.59.37', dev_port))
             comand = b'import_keys\r'
             n = b'\n'
             space = b' '

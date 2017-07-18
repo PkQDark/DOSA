@@ -1,5 +1,5 @@
 from django import forms
-from .models import Company
+from .models import Company, Device
 
 
 class CompanyForm(forms.ModelForm):
@@ -8,6 +8,15 @@ class CompanyForm(forms.ModelForm):
         fields = {'name', 'comment'}
         widgets = {'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Название', 'maxlength': 100}),
                    'comment': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Комментарий'})}
+
+
+class DeviceForm(forms.ModelForm):
+    class Meta:
+        model = Device
+        fields = {'company', 'dev_id', 'port'}
+        widgets = {'company': forms.TextInput(attrs={'class': 'form-control readonly', 'placeholder': 'Компания', 'maxlength': 100}),
+                   'dev_id': forms.Textarea(attrs={'class': 'form-control readonly', 'placeholder': 'Комментарий'}),
+                   'port': forms.NumberInput(attrs={'class': 'form-control'})}
 
 
 class AddIDForm(forms.Form):

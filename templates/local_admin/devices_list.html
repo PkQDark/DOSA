@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}
+    <title>Перечень устройств</title>
+{% endblock %}
+
+{% block navbar-header %}
+    <a class="navbar-brand">Администратор DOSA</a>
+{% endblock %}
+
+{% block navigation %}
+    <!-- Определение активной вкладки -->
+    <li><a href="/admin/">Компании</a></li>
+    <li><a href="/admin/local-admins/">Локальные администраторы</a></li>
+    <li class="active"><a href="/admin/devices-list/">Зарегистрированные устройства</a></li>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="panel panel-default panel-my">
+            <div class="panel-heading panel-heading-my clearfix">
+                <form method="get" class="form-inline navbar-form navbar-left"> {% csrf_token %}
+                    Фильтровать по
+                    <label for="id_company" class="sr-only">Компания</label>
+                    <input type="text" id="id_company" class="form-control" placeholder="компании" name="company">
+                    <label for="id_port" class="sr-only">Порту</label>
+                    <input type="text" id="id_port" class="form-control" placeholder="порту" name="port">
+                    <button class="btn btn-default" type="submit">Фильтровать</button>
+                </form>
+            </div>
+            <!-- Таблица устройств -->
+            <div>
+                <table class="local_admin_table table table-striped" id="la_table">
+                    <thead>
+                        <tr>
+                            <th class="col-sm-1" style="text-align: center;">#</th>
+                            <th class="col-sm-4">Компания</th>
+                            <th class="col-sm-6">Номер</th>
+                            <th class="col-sm-2">Порт</th>
+                            <th class="col-sm-1" style="text-align: center;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for devs in devices %}
+                            <tr>
+                                <td style="text-align: center;">{{ forloop.counter }}</td>
+                                <td>{{ devs.company}}</td>
+                                <td>{{ devs.dev_id }}</td>
+                                <td>{{ devs.port }}</td>
+                                <td style="vertical-align: middle; text-align: center;">
+                                    <a href="/admin/devices-list/edit/{{devs.id}}"
+                                           class="button edit btn btn-default glyphicon glyphicon-pencil"></a>
+                                </td>>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function () {
+            $("#la_table").tablesorter({
+                headers: {0: {sorter: false}, 5: {sorter: false}}
+            });
+
+            $('.form-control').click(function(){
+                $(this).val('')
+            });
+        });
+    </script>
+{% endblock %}

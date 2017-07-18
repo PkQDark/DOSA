@@ -23,9 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '^53x)5-^9h(y=dj2)+*ar3!38dq*4=pzhk*(1q0y&rdd9vgg0$'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['dosaweb.ml']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'local_admin',
     'company_admin',
     'users',
-    'serv',
 
 ]
 
@@ -62,7 +61,7 @@ ROOT_URLCONF = 'DOSA_sim.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['/opt/DOSA_sim/templates'],
+        'DIRS': ['templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -84,9 +83,9 @@ WSGI_APPLICATION = 'DOSA_sim.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'dosa',
-        'USER': 'dosa',
-        'PASSWORD': 'ohKol9negheizipieg',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'password',
         'HOST': 'localhost',
         'PORT': '5432',
     }

@@ -6,7 +6,28 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.contrib.auth.forms import UserCreationForm
 
 from .models import Company, Device, CompanyUser
-from .forms import CompanyForm, AddIDForm, AddSystemUserForm
+from .forms import CompanyForm, AddIDForm, AddSystemUserForm, DeviceForm
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def device_list(request):
+    cur_user = request.user.username
+    devs = Device.objects.all()
+    return render(request, 'local_admin/devices_list.html', {'devices': devs, 'cur_user': cur_user})
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def edit_device(request, dev_id):
+    cur_user = request.user.username
+    cur_dev = Device.objects.get(id=dev_id)
+    if request.method == 'POST':
+        edit_form = DeviceForm(request.POST, instance=cur_dev)
+        if edit_form.is_valid():
+            edit_form.save()
+    else:
+        edit_form = DeviceForm(instance=cur_dev)
+    return render(request, 'local_admin/device_edit.html', {'edit_form': edit_form, 'cur_user': cur_user})
+
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -35,9 +56,14 @@ def add_company_view(request):
             messages.add_message(request, messages.SUCCESS, 'Компания успешно зарегистрирована.')
             try:
                 dev_doc = request.FILES['key_file'].read().decode().split()
+                dev_disc = {}
+                for i in range(len(dev_doc) - 1):
+                    if i % 2 == 1:
+                        continue
+                    dev_disc[dev_doc[i]] = int(dev_doc[i + 1])
                 dev_counter = 0
-                for dev in dev_doc:
-                    new_dev, created = Device.objects.get_or_create(dev_id=dev, defaults={'company': new_company})
+                for dev in dev_disc:
+                    new_dev, created = Device.objects.get_or_create(dev_id=dev, port=dev_disc.get(dev), defaults={'company': new_company})
                     if created:
                         dev_counter += 1
                     else:
@@ -63,9 +89,14 @@ def edit_company_view(request, company_id):
         if edit_company.is_valid():
             try:
                 dev_doc = request.FILES['key_file'].read().decode().split()
+                dev_disc = {}
+                for i in range(len(dev_doc) - 1):
+                    if i % 2 == 1:
+                        continue
+                    dev_disc[dev_doc[i]] = int(dev_doc[i + 1])
                 dev_counter = 0
-                for dev in dev_doc:
-                    new_dev, created = Device.objects.get_or_create(dev_id=dev, defaults={'company': cur_com})
+                for dev in dev_disc:
+                    new_dev, created = Device.objects.get_or_create(dev_id=dev, port=dev_disc.get(dev), defaults={'company': cur_com})
                     if created:
                         dev_counter += 1
                     else:
