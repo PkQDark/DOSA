@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% block title %}
+    <title>Перечень отгрузок</title>
+{% endblock %}
+
+{% block navbar-header %}
+    <a class="navbar-brand">Пользователь {{ company }}</a>
+{% endblock %}
+
+{% block head %}
+    <style type="text/css">
+        #id_start_date, #id_end_date{
+            max-width: 140px;
+        }
+    </style>
+{% endblock %}
+
+{% block navigation %}
+    <!-- Определение активной вкладки -->
+    <li class="active"><a href="/user/">Отгрузки</a></li>
+    <li><a href="/user/cisterns/">Резервуары</a></li>
+    <li><a href="/user/keys/">Ключи</a></li>
+{% endblock %}
+
+{% block messages %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                <a class="close" data-dismiss="alert">×</a>
+                {{ message|safe }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="panel panel-default panel-my">
+            <div class="panel-heading panel-heading-my clearfix">
+                <form method="get" class="form-inline navbar-form navbar-left" style="padding-left: 0;"> {% csrf_token %}
+                    <label for="id_filter_name" class="sr-only">имени</label>
+                    <input type="text" id="id_filter_name" class="form-control" placeholder="имени" name="filter_name">
+                    <label for="id_filter_car" class="sr-only">машине</label>
+                    <input type="text" id="id_filter_car" class="form-control" placeholder="машине" name="filter_car">
+                    <label for="id_filter_fuel" class="sr-only">типу жидкости</label>
+                    <input type="text" id="id_filter_fuel" class="form-control" placeholder="топливу" name="filter_fuel">
+                    <label for="id_start_date_picker" class="sr-only">дате с</label>
+                    {{ date_filter.start_date }}
+                    <label for="id_end_date_picker" class="sr-only">по</label>
+                    {{ date_filter.end_date }}
+                    <button class="btn btn-default" type="submit" title="Фильтровать">
+                        <span class="glyphicon glyphicon-filter"></span>
+                    </button>
+                    <a href="/user/" class="btn btn-default" title="Сбросить фильтры">
+                        <span class="glyphicon glyphicon-remove-circle"></span>
+                    </a>
+                    <button class="btn btn-success" name="to_xls" value=1 type="submit" title="Экспорт в Excel">
+                        <span class="glyphicon glyphicon-list-alt"></span>
+                    </button>
+                </form>
+            </div>
+            <!-- Таблица отгрузок -->
+            <div>
+                <table class="local_user_table table table-striped" id="db_table">
+                    <thead>
+                        <tr>
+			                <th class="col-sm-1" style="text-align: center; vertical-align: middle;">#</th>
+			                <th style="vertical-align: middle;">Имя</th>
+			                <th style="vertical-align: middle;">Машина</th>
+                            <th style="vertical-align: middle;">Резервуар</th>
+                            <th style="vertical-align: middle;">Топливо</th>
+			                <th style="text-align: center; vertical-align: middle;">Ключ</th>
+			                <th>Отгружено</th>
+			                <th style="text-align: center;">Дата</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in db %}
+                            <tr>
+                                <td style="text-align: center;">{{ forloop.counter }}</td>
+                                <td>
+                                    {% if entry.user.name %}
+                                        {{ entry.user.name }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if entry.user.car %}
+                                        {{ entry.user.car }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if entry.dev.cistern %}
+                                        <a href="/user/cisterns/{{ entry.dev.cistern.id }}">
+                                            {{ entry.dev.cistern.name }}
+                                        </a>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if entry.dev.cistern %}
+                                        <a href="/user/fuels/{{ entry.dev.cistern.fuel.id }}">
+                                            {{ entry.dev.cistern.fuel.name }}
+                                        </a>
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: center;">{{ entry.user.keys }}</td>
+                                <td>{{ entry.dosed }}</td>
+                                <td style="text-align: center;">{{ entry.date_time|date:'d.m.Y H:i' }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function () {
+            $("#db_table").tablesorter({
+                 dateFormat : "ddmmyyyy",
+                headers: {
+                    7: {sorter: "shortDate"}
+                }
+            });
+            $('.form-control').click(function(){
+                $(this).val('')
+            });
+            jQuery.datetimepicker.setLocale('ru');
+            $(".datepicker").datetimepicker({
+                timepicker:false,
+                format:'d.m.Y'
+            });
+        });
+    </script>
+{% endblock %}

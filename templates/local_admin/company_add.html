@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}
+    <title>Регистрация компании</title>
+{% endblock %}
+
+{% block navbar-header %}
+    <a class="navbar-brand">Администратор DOSA</a>
+{% endblock %}
+
+{% block navigation %}
+    <!-- Определение активной вкладки -->
+    <li><a href="/admin/">Компании</a></li>
+    <li><a href="/admin/local-admins/">Локальные администраторы</a></li>
+{% endblock %}
+
+{% block messages %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                <a class="close" data-dismiss="alert">×</a>
+                {{ message|safe }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if add_company.name.errors %}
+        {% for error in add_company.name.errors %}
+            <div class="alert alert-error">
+                <a class="close" data-dismiss="alert">×</a>
+                {% if error == "Company с таким Name уже существует." %}
+                    Компания с таким названием уже существует в БД
+                {% else %}
+                    {{ error }}
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="panel panel-default panel-my">
+            <div class="panel-heading panel-heading-my"><h4>Добавить компанию</h4></div>
+            <div class="jumbotron">
+                <form method="post" enctype="multipart/form-data"> {% csrf_token %}
+                    {% load widget_tweaks %}
+                    {{ add_company.name|attr:'required:true' }}
+                    {{ add_company.comment }}
+                    <span class="btn btn-file">
+                <i class="icon-plus"> </i><span>Файл серийных номеров</span>
+                {{ add_devs }}
+            </span>
+                    <br>
+
+                    <div class="row">
+                        <div class="col-md-3 col-md-offset-9">
+                            <button class="btn btn-block btn-lg btn-file" type="submit">Добавить</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        (function ($) {
+            $(function () {
+                $('.btn-file').each(function () {
+                    var self = this;
+                    $('input[type=file]', this).change(function () {
+                        // remove existing file info
+                        $(self).next().remove();
+                        // get value
+                        var value = $(this).val();
+                        // get file name
+                        var fileName = value.substring(value.lastIndexOf('/') + 1);
+                        // get file extension
+                        var fileExt = fileName.split('.').pop().toLowerCase();
+                        // append file info
+                        $('<span><i class="icon-file icon-' + fileExt + '"></i> ' + fileName + '</span>').insertAfter(self);
+                    });
+                });
+            });
+        })(jQuery);
+    </script>
+{% endblock %}

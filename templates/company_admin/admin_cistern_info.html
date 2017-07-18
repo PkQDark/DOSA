@@ -1,0 +1,331 @@
+{% extends 'base.html' %}
+{% block title %}
+    <title>Статистика резервуара</title>
+{% endblock %}
+
+{% block navbar-header %}
+    <a class="navbar-brand">Администратор {{ company }}</a>
+{% endblock %}
+
+{% block head %}
+    <style type="text/css">
+        #id_start_date, #id_end_date{
+            max-width: 140px;
+            margin-top: 2px;
+        }
+    </style>
+{% endblock %}
+
+{% block navigation %}
+    <!-- Определение активной вкладки -->
+    <li><a href="/local-admin/">Отгрузки</a></li>
+    <li><a href="/local-admin/cisterns/">Резервуары</a></li>
+    <li><a href="/local-admin/fuels/">Топливо</a></li>
+    <li><a href="/local-admin/keys/">Ключи</a></li>
+    <li><a href="/local-admin/users/">Пользователи</a></li>
+{% endblock %}
+
+{% block messages %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                <a class="close" data-dismiss="alert">×</a>
+                {{ message|safe }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    {% if add_updosed.non_field_errors %}
+        {% for error in add_updosed.non_field_errors %}
+            <div class="alert alert-danger">
+                <a class="close" data-dismiss="alert">×</a>
+                {{ error }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    {% for field in add_updosed %}
+        {% if field.errors %}
+            {% for error in field.errors %}
+                <div class="alert alert-danger">
+                    <a class="close" data-dismiss="alert">×</a>
+                    {{ error }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+    {% if add_keys.non_field_errors %}
+        {% for error in add_keys.non_field_errors %}
+            <div class="alert alert-danger">
+                <a class="close" data-dismiss="alert">×</a>
+                {{ error }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% for field in add_keys %}
+        {% if field.errors %}
+            {% for error in field.errors %}
+                <div class="alert alert-danger">
+                    <a class="close" data-dismiss="alert">×</a>
+                    {{ error }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+{% endblock %}
+
+{% block content %}
+    <!-- Добавление загрузки -->
+    <div id="add_up" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #333333; border-color: #333333; color: #ffffff;">
+                    <h4>Добавить загрузку
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button></h4>
+                </div>
+                <div class="modal-body">
+                    <form method="post" class="form-horizontal">{% csrf_token %}
+                        <div class="form-group">
+                            {% load widget_tweaks %}
+                            <input type="hidden" name="load_id" id="id_toggle"/>
+                            <label for="id_volume" class="col-sm-3 control-label">Объем:</label>
+                            <div class="col-sm-7">{{ add_updosed.volume|attr:'required:true' }}</div>
+                            <label for="id_comment" class="col-sm-3 control-label">Комментарий:</label>
+                            <div class="col-sm-7">{{ add_updosed.comment }}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3 col-md-offset-9">
+                                <button class="btn btn-default btn-file" type="submit">Добавить</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <div class="container">
+        <ul class="nav nav-pills" id="dosing-table">
+            <li role="presentation" class="{% if nav == 'downdosed' %}active{% endif %} tab" id="downdosed" onclick="tab(this)" data-toggle="tab">
+                <a href="#id_downdosed" data-toggle="tab">Отгрузки</a>
+            </li>
+            <li role="presentation" class="{% if nav == 'updosed' %}active{% endif %} tab" id="updosed" onclick="tab(this)" data-toggle="tab">
+                <a href="#id_updosed" data-toggle="tab">Загрузки</a>
+            </li>
+            <li role="presentation" class="{% if nav == 'recovery' %}active{% endif %} tab" id="recovery" onclick="tab(this)" data-toggle="tab">
+                <a href="#id_recovery" data-toggle="tab">Восстановление</a>
+            </li>
+        </ul>
+        <div class="panel panel-default panel-my">
+            <div class="panel-heading panel-heading-my clearfix">
+                <form method="get" class="form-inline navbar-form navbar-left" style="padding-left: 0;"> {% csrf_token %}
+                    <input type="hidden" name="nav" id="id_nav"/>
+                    <label for="id_filter_name" class="sr-only">имени</label>
+                    <input type="text" id="id_filter_name" class="form-control" placeholder="имени" name="filter_name">
+                    <label for="id_filter_car" class="sr-only">машине</label>
+                    <input type="text" id="id_filter_car" class="form-control" placeholder="машине" name="filter_car">
+                    <label for="id_start_date" class="sr-only">дате с</label>
+                    {{ date_filter.start_date }}
+                    <label for="id_end_date" class="sr-only">по</label>
+                    {{ date_filter.end_date }}
+                    <button class="btn btn-default" type="submit" title="Фильтровать">
+                        <span class="glyphicon glyphicon-filter"></span>
+                    </button>
+                    <button class="btn btn-default" title="Сбросить фильтры" id="reset_filter" type="submit">
+                        <span class="glyphicon glyphicon-remove-circle"></span>
+                    </button>
+                    <button class="btn btn-success" id="to_xls" name="to_xls" value=1 type="submit" title="Экспорт в Excel">
+                        <span class="glyphicon glyphicon-list-alt"></span>
+                    </button>
+                    <button class="btn btn-warning" id="trash" name="delete" value=1 type="submit" title="Удалить записи">
+                        <span class="glyphicon glyphicon-trash"></span>
+                    </button>
+                    <button class="btn btn-primary" id="recover" name="recover" value=1 type="submit" title="Восстановить записи"
+                            style="display: none;">
+                        <span class="glyphicon glyphicon-chevron-up"></span>
+                    </button>
+                </form>
+                <form method="post" class="form-inline navbar-form navbar-left" enctype="multipart/form-data"
+                        style="margin-top: 10px;"> {% csrf_token %}
+                    <span class="btn btn-file btn-default" style="background-color: #fff; border-color: #ccc; color: #333">
+                        <i class="icon-plus"> </i><span>Файл ключей</span>
+                        {{ add_keys }}
+                    </span>
+                    <button class="btn btn-info" type="submit" title="Добавить ключи" id="id_move">
+                        <span class="glyphicon glyphicon-open-file"></span>
+                    </button>
+                </form>
+            </div>
+                        <div class="tab-content">
+                <div class="tab-pane {% if nav == 'downdosed' %}active{% endif %}" id="id_downdosed">
+                <!-- Таблица отгрузок -->
+                    <table class="local_user_table table table-striped" id="dd_table">
+                        <thead>
+                            <tr>
+                                <th class="col-sm-1" style="text-align: center; vertical-align: middle;">#</th>
+                                <th style="vertical-align: middle;">Имя</th>
+                                <th style="vertical-align: middle;">Машина</th>
+                                <th style="text-align: center; vertical-align: middle;">Ключ</th>
+                                <th>Отгружено</th>
+                                <th style="text-align: center;">Дата</th>
+                                <th style="vertical-align: middle;">Объем в цистерне</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for dd in downdosed %}
+                                <tr>
+                                    <td style="text-align: center;">{{ forloop.counter }}</td>
+                                    <td>
+                                        {% if dd.user.name %}
+                                            {{ dd.user.name }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if dd.user.car %}
+                                            {{ dd.user.car }}
+                                        {% endif %}
+                                    </td>
+                                    <td style="text-align: center;">{{ dd.user.keys }}</td>
+                                    <td>{{ dd.dosed }}</td>
+                                    <td style="text-align: center;">{{ dd.date_time|date:'d.m.Y H:i' }}</td>
+                                    <td>{{ dd.cistern_volume }}</td>
+                                    <td>
+                                        <button class="edit add-vol btn btn-default glyphicon glyphicon-pencil"
+                                                data-toggle="modal" data-target="#add_up" id="{{ dd.id }}"
+                                                onclick="to_toggle(this, 'none')"></button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane" id="id_updosed">
+                    <!-- Таблица загрузок -->
+                    <table class="local_user_table table table-striped" id="ud_table">
+                        <thead>
+                            <tr>
+                                <th class="col-sm-1" style="text-align: center; vertical-align: middle;">#</th>
+                                <th class="col-sm-2" style="text-align: center;">Дата</th>
+                                <th class="col-sm-1">Объем</th>
+                                <th class="col-sm-5" style="text-align: center;">Пользователь</th>
+                                <th class="col-sm-5" style="text-align: center;">Комментарий</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in updosed %}
+                                <tr>
+                                    <td style="text-align: center;">{{ forloop.counter }}</td>
+                                    <td style="text-align: center;">{{ entry.date_time|date:'d.m.Y H:i' }}</td>
+                                    <td>{{ entry.volume }}</td>
+                                    <td>{{ entry.user.user.username }}</td>
+                                    <td>
+                                        {% if entry.comment %}
+                                            {{ entry.comment }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane" id="id_recovery">
+                    <!-- Таблица восстановления -->
+                    <table class="local_user_table table table-striped" id="rec_table">
+                        <thead>
+                            <tr>
+                                <th class="col-sm-1" style="text-align: center; vertical-align: middle;">#</th>
+                                <th style="vertical-align: middle;">Имя</th>
+                                <th style="vertical-align: middle;">Машина</th>
+                                <th style="text-align: center; vertical-align: middle;">Ключ</th>
+                                <th>Отгружено</th>
+                                <th style="text-align: center;">Дата</th>
+                                <th style="vertical-align: middle;">Объем в цистерне</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rec in recovery %}
+                                <tr>
+                                    <td style="text-align: center;">{{ forloop.counter }}</td>
+                                    <td>
+                                        {% if rec.user.name %}
+                                            {{ rec.user.name }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if rec.user.car %}
+                                            {{ rec.user.car }}
+                                        {% endif %}
+                                    </td>
+                                    <td style="text-align: center;">{{ rec.user.keys }}</td>
+                                    <td>{{ rec.dosed }}</td>
+                                    <td style="text-align: center;">{{ rec.date_time|date:'d.m.Y H:i' }}</td>
+                                    <td>{{ rec.cistern_volume }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+        <script>
+        $(document).ready(function () {
+            $("#dd_table").tablesorter({
+                dateFormat: "ddmmyyyy",
+                headers: {
+                    5: {sorter: "shortDate"},
+                    7: {sorter: false}
+                }
+            });
+
+            $("#ud_table").tablesorter({
+                dateFormat: "ddmmyyyy",
+                headers: {
+                    1: {sorter: "shortDate"},
+                    4: {sorter: false}
+                }
+            });
+
+            $("#rec_table").tablesorter({
+                dateFormat: "ddmmyyyy",
+                headers: {
+                    5: {sorter: "shortDate"}
+                }
+            });
+
+            jQuery.datetimepicker.setLocale('ru');
+            $(".datepicker").datetimepicker({
+                timepicker:false,
+                format:'d.m.Y'
+            });
+
+            $('.form-control').click(function () {
+                $(this).val('')
+            });
+
+            $('#reset_filter').click(function() {
+                $('.form-control').val('')
+            });
+        });
+    </script>
+    <script type="text/javascript">
+        (function ($) {
+            $(function () {
+                $('.btn-file').each(function () {
+                    var self = this;
+                    $('input[type=file]', this).change(function () {
+                        // get value
+                        var value = $(this).val();
+                        // get file name
+                        var fileName = value.substring(value.lastIndexOf('/') + 1);
+                        // get file extension
+                        var fileExt = fileName.split('.').pop().toLowerCase();
+                        // append file info
+                        $('<span id="id_info"><i class="icon-file icon-' + fileExt + '"></i> ' + fileName + '</span>').insertAfter(self);
+                    });
+                });
+            });
+        })(jQuery);
+    </script>
+{% endblock %}

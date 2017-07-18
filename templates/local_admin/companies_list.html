@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% block title %}
+    <title>Перечень компаний</title>
+{% endblock %}
+
+{% block navbar-header %}
+    <a class="navbar-brand">Администратор DOSA</a>
+{% endblock %}
+
+{% block navigation %}
+    <!-- Определение активной вкладки -->
+    <li class="active"><a href="/admin/">Компании</a></li>
+    <li><a href="/admin/local-admins/">Локальные администраторы</a></li>
+{% endblock %}
+
+{% block content %}
+    <div id="disable_lu" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #333333; border-color: #333333; color: #ffffff;">
+                    <p id="h_p"></p>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post">{% csrf_token %}
+                        <input type="hidden" name="company_stop" id="id_toggle"/>
+                        <p style="text-align: center;" id="p_q"></p>
+                        <div class="row">
+                            <div class="col-md-4 col-md-offset-5">
+                                <button class="btn btn-default btn-file" type="submit">Применить</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="container">
+        <div class="panel panel-default panel-my">
+            <div class="panel-heading panel-heading-my clearfix">
+                <form method="get" class="form-inline navbar-form navbar-left"> {% csrf_token %}
+                    Фильтровать по
+                    <label for="inputText" class="sr-only">Компания</label>
+                    <input type="text" id="inputText" class="form-control" placeholder="названию" name="company">
+                    <button class="btn btn-default" type="submit">Фильтровать</button>
+                </form>
+                <div class="input-group pull-right" style="padding-top: 9px; padding-right: 9px;">
+                    <a href="/admin/add-company/" class="navbar-link navbar-right navbar-nav nav">
+                        <button class="btn btn-default"><span class="glyphicon glyphicon-plus"></span>компанию</button>
+                    </a>
+                </div>
+            </div>
+            <!-- Таблица компаний -->
+            <div>
+                <table class="companies_table table table-striped" id="c_table">
+                    <thead>
+                        <tr>
+                            <th class="col-sm-1" style="text-align: center;">#</th>
+                            <th class="col-sm-3">Название</th>
+                            <th  class="col-sm-5" style="text-align: center;">Комментарий</th>
+                            <th class="col-sm-1"></th>
+                            <th class="col-sm-1"></th>
+                            <th class="col-sm-1"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for company in companies %}
+                            <tr>
+                                <td style="text-align: center;">{{ forloop.counter }}</td>
+                                <td>{{ company.name }}</td>
+                                <td>
+                                    {% if company.comment %}
+                                        {{ company.comment }}
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: center;">
+                                    <a href="/admin/{{company.id}}/add-admin" title="Добавить ЛА"
+                                       class="button edit btn btn-default glyphicon glyphicon-user"></a>
+                                </td>
+                                <td style="text-align: center;">
+                                    <a href="/admin/edit-company/{{company.id}}" title="Редактировать"
+                                       class="button edit btn btn-default glyphicon glyphicon-pencil"></a>
+                                </td>
+                                <td style="text-align: center;">
+                                    {% if company.active %}
+                                        <button class="edit btn btn-default" data-toggle="modal"
+                                                data-target="#disable_lu" onclick="to_toggle(this, 'stop')" id="{{ company.id }}">
+                                        <span class="glyphicon glyphicon-remove" title="Приостановить"></span></button>
+                                    {% else %}
+                                        <button class="edit btn btn-default" data-toggle="modal"
+                                                data-target="#disable_lu" onclick="to_toggle(this, 'run')" id="{{ company.id }}">
+                                        <span class="glyphicon glyphicon-ok" title="Возобновить"></span></button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function () {
+            $("#c_table").tablesorter({
+                headers: {
+                    0: {sorter: false},
+                    2: {sorter: false},
+                    3: {sorter: false},
+                    4: {sorter: false},
+                    5: {sorter: false}
+                }
+            });
+
+            $('.form-control').click(function(){
+                $(this).val('')
+            });
+
+        });
+    </script>
+{% endblock %}
