@@ -438,7 +438,8 @@ def cistern_add(request):
 
 def send_request_to_data(dev_id, comand, request):
     sock = socket.socket()
-    dev_port = Device.objects.get(dev_id).port
+    port = Device.objects.get(dev_id=dev_id)
+    dev_port = port.port
     sock.connect(('195.12.59.37', dev_port))
     n = b'\n'
     space = b' '
