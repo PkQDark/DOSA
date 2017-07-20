@@ -32,3 +32,7 @@ function to_toggle(elem, par) {
     }
 }
 
+function pag(page, togId){
+    document.getElementById(togId).value = page;
+    document.getElementById('filter').click();
+}
