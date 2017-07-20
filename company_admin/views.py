@@ -612,7 +612,7 @@ def cistern_info(request, cist_id):
                         previous_cist_volume = db.cistern_volume
                         db.save()
                 next_dosings = Database.objects.filter(date_time__gt=load.date_time, dev__company=company,
-                                                       dev__cistern__fuel=load.user.cistern.fuel).order_by('date_time')
+                                                       dev__cistern__fuel=load.dev.cistern.fuel).order_by('date_time')
                 if len(next_dosings):
                     previous_fuel_volume = load.fuel_volume
                     for db in next_dosings:
