@@ -32,8 +32,8 @@ function to_toggle(elem, par) {
     }
 }
 
-function pag(page, togId){
-    console.log(page, togId);
-    document.getElementById(togId).value = page;
+function pag(elem, togId){
+    console.log(elem.title, togId);
+    document.getElementById(togId).value = elem.title;
     document.getElementById('filter').click();
 }
