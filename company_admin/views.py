@@ -591,7 +591,7 @@ def cistern_info(request, cist_id):
         if add_updosed.is_valid():
             if add_updosed.cleaned_data['volume']:
                 load = Database.objects.get(id=request.POST.get('load_id'))
-                if add_updosed.cleaned_data['volume'] + load.cistern_volume > load.cistern.max_volume:
+                if add_updosed.cleaned_data['volume'] + load.cistern_volume > load.dev.cistern.max_volume:
                     messages.add_message(request, messages.WARNING, 'Текущий объем не может быть больше максимального')
                     return HttpResponseRedirect('/local-admin/cisterns/')
                 add = UpDosed(user=request.user.companyuser, dev=cist.dev, date_time=load.date_time,
@@ -612,7 +612,7 @@ def cistern_info(request, cist_id):
                         previous_cist_volume = db.cistern_volume
                         db.save()
                 next_dosings = Database.objects.filter(date_time__gt=load.date_time, dev__company=company,
-                                                       dev__cistern__fuel=load.user.cistern.fuel).order_by('date_time')
+                                                       dev__cistern__fuel=load.dev.cistern.fuel).order_by('date_time')
                 if len(next_dosings):
                     previous_fuel_volume = load.fuel_volume
                     for db in next_dosings:
