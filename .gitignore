@@ -1,3 +1,6 @@
 *.log
 *.log.*
 worker.log
+settings.py
+*.pyc
+/.idea/
