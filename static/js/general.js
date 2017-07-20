@@ -33,6 +33,7 @@ function to_toggle(elem, par) {
 }
 
 function pag(page, togId){
+    console.log(page, togId);
     document.getElementById(togId).value = page;
     document.getElementById('filter').click();
 }
