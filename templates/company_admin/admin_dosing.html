@@ -120,13 +120,13 @@
                         {% if db.has_previous %}
                             <li>
                                 <a title="1" id="1"
-                                   onclick="pag(this, '#id_db_page')">
+                                   onclick="pag(this, 'id_db_page')">
                                     <span aria-hidden="true">&laquo;</span>
                                 </a>
                             </li>
                             <li>
                                 <a id="{{ db.previous_page_number }}"
-                                   onclick="pag(this, '#id_db_page')"
+                                   onclick="pag(this, 'id_db_page')"
                                    title="{{ db.previous_page_number }}">
                                     <span aria-hidden="true">&lsaquo;</span>
                                 </a>
@@ -147,14 +147,14 @@
                         {% if db.has_next %}
                             <li>
                                 <a id="{{ db.next_page_number }}"
-                                   onclick="pag(this, '#id_db_page')"
+                                   onclick="pag(this, 'id_db_page')"
                                    title="{{ db.next_page_number }}">
                                     <span aria-hidden="true">&rsaquo;</span>
                                 </a>
                             </li>
                             <li>
                                 <a id="{{ db.paginator.num_pages }}"
-                                   onclick="pag(this, '#id_db_page')"
+                                   onclick="pag(this, 'id_db_page')"
                                    title="{{ db.paginator.num_pages }}">
                                     <span aria-hidden="true">&raquo;</span>
                                 </a>
