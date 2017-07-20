@@ -33,6 +33,6 @@ function to_toggle(elem, par) {
 }
 
 function pag(elem, togId){
-    document.getElementById(togId).value = elem.id;
+    document.getElementById(togId).value = elem.id; //передаем страницу
     document.getElementById('filter').click();
 }
