@@ -591,7 +591,7 @@ def cistern_info(request, cist_id):
         if add_updosed.is_valid():
             if add_updosed.cleaned_data['volume']:
                 load = Database.objects.get(id=request.POST.get('load_id'))
-                if add_updosed.cleaned_data['volume'] + load.cistern_volume > load.cistern.max_volume:
+                if add_updosed.cleaned_data['volume'] + load.cistern_volume > load.dev.cistern.max_volume:
                     messages.add_message(request, messages.WARNING, 'Текущий объем не может быть больше максимального')
                     return HttpResponseRedirect('/local-admin/cisterns/')
                 add = UpDosed(user=request.user.companyuser, dev=cist.dev, date_time=load.date_time,
