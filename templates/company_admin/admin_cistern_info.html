@@ -128,7 +128,11 @@
                     {{ date_filter.start_date }}
                     <label for="id_end_date" class="sr-only">по</label>
                     {{ date_filter.end_date }}
-                    <button class="btn btn-default" type="submit" title="Фильтровать">
+                    <!-- Страницы пагинации -->
+                    <input type="hidden" name="db_page" id="id_db_page"/>
+                    <input type="hidden" name="ud_page" id="id_ud_page"/>
+                    <input type="hidden" name="rec_page" id="id_rec_page"/>
+                    <button class="btn btn-default" type="submit" title="Фильтровать" id="filter">
                         <span class="glyphicon glyphicon-filter"></span>
                     </button>
                     <button class="btn btn-default" title="Сбросить фильтры" id="reset_filter" type="submit">
@@ -203,13 +207,15 @@
                         <ul class="pagination">
                             {% if downdosed.has_previous %}
                                 <li>
-                                    <a href="?db_page=1" title="1">
+                                    <a title="1" id="1"
+                                       onclick="pag(this, 'id_db_page')">
                                         <span aria-hidden="true">&laquo;</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="?db_page={{ downdosed.previous_page_number }}"
-                                       title="{{ downdosed.previous_page_number }}" >
+                                    <a id="{{ downdosed.previous_page_number }}"
+                                       onclick="pag(this, 'id_db_page')"
+                                       title="{{ downdosed.previous_page_number }}">
                                         <span aria-hidden="true">&lsaquo;</span>
                                     </a>
                                 </li>
@@ -228,14 +234,16 @@
                             </li>
                             {% if downdosed.has_next %}
                                 <li>
-                                    <a href="?db_page={{ downdosed.next_page_number }}"
-                                       title="{{ downdosed.next_page_number }}" >
+                                    <a id="{{ downdosed.next_page_number }}"
+                                       onclick="pag(this, 'id_db_page')"
+                                       title="{{ downdosed.next_page_number }}">
                                         <span aria-hidden="true">&rsaquo;</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="?db_page={{ downdosed.paginator.num_pages }}"
-                                       title="{{ downdosed.paginator.num_pages }}" >
+                                    <a id="{{ downdosed.paginator.num_pages }}"
+                                       onclick="pag(this, 'id_db_page')"
+                                       title="{{ downdosed.paginator.num_pages }}">
                                         <span aria-hidden="true">&raquo;</span>
                                     </a>
                                 </li>
@@ -282,13 +290,15 @@
                         <ul class="pagination">
                             {% if updosed.has_previous %}
                                 <li>
-                                    <a href="?ud_page=1" title="1">
+                                    <a title="1" id="1"
+                                       onclick="pag(this, 'id_ud_page')">
                                         <span aria-hidden="true">&laquo;</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="?ud_page={{ updosed.previous_page_number }}"
-                                       title="{{ updosed.previous_page_number }}" >
+                                    <a id="{{ updosed.previous_page_number }}"
+                                       onclick="pag(this, 'id_ud_page')"
+                                       title="{{ updosed.previous_page_number }}">
                                         <span aria-hidden="true">&lsaquo;</span>
                                     </a>
                                 </li>
@@ -307,14 +317,16 @@
                             </li>
                             {% if updosed.has_next %}
                                 <li>
-                                    <a href="?ud_page={{ updosed.next_page_number }}"
-                                       title="{{ updosed.next_page_number }}" >
+                                    <a id="{{ updosed.next_page_number }}"
+                                       onclick="pag(this, 'id_ud_page')"
+                                       title="{{ updosed.next_page_number }}">
                                         <span aria-hidden="true">&rsaquo;</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="?ud_page={{ updosed.paginator.num_pages }}"
-                                       title="{{ updosed.paginator.num_pages }}" >
+                                    <a id="{{ updosed.paginator.num_pages }}"
+                                       onclick="pag(this, 'id_ud_page')"
+                                       title="{{ updosed.paginator.num_pages }}">
                                         <span aria-hidden="true">&raquo;</span>
                                     </a>
                                 </li>
@@ -369,13 +381,15 @@
                         <ul class="pagination">
                             {% if recovery.has_previous %}
                                 <li>
-                                    <a href="?rec_page=1" title="1">
+                                    <a title="1" id="1"
+                                       onclick="pag(this, 'id_rec_page')">
                                         <span aria-hidden="true">&laquo;</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="?rec_page={{ recovery.previous_page_number }}"
-                                       title="{{ recovery.previous_page_number }}" >
+                                    <a id="{{ recovery.previous_page_number }}"
+                                       onclick="pag(this, 'id_rec_page')"
+                                       title="{{ recovery.previous_page_number }}">
                                         <span aria-hidden="true">&lsaquo;</span>
                                     </a>
                                 </li>
@@ -394,14 +408,16 @@
                             </li>
                             {% if recovery.has_next %}
                                 <li>
-                                    <a href="?rec_page={{ recovery.next_page_number }}"
-                                       title="{{ recovery.next_page_number }}" >
+                                    <a id="{{ recovery.next_page_number }}"
+                                       onclick="pag(this, 'id_rec_page')"
+                                       title="{{ recovery.next_page_number }}">
                                         <span aria-hidden="true">&rsaquo;</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="?rec_page={{ recovery.paginator.num_pages }}"
-                                       title="{{ recovery.paginator.num_pages }}" >
+                                    <a id="{{ recovery.paginator.num_pages }}"
+                                       onclick="pag(this, 'id_rec_page')"
+                                       title="{{ recovery.paginator.num_pages }}">
                                         <span aria-hidden="true">&raquo;</span>
                                     </a>
                                 </li>
