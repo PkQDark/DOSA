@@ -321,6 +321,7 @@ def answer_to_limit(input_text, sock):
 def wait_for_limit(sock, dev_id):
     input_text = b''
     global comand
+    disconnect = 0
     while not input_text.endswith(b'\r'):
         if comand.check_flag():
             if comand.found_device(dev_id):
@@ -347,6 +348,9 @@ def wait_for_limit(sock, dev_id):
             logger.info('Text in socket is - ' + repr(input_text))
         except socket.timeout:
             logger.info('TO')
+            disconnect += 1
+            if disconnect >= 1000:
+                return 'err_1000'
             continue
         except UnicodeError:
             logger.info('Unicode error - for wfl')
@@ -375,9 +379,10 @@ def handle(sock, client_ip, client_port):
         dev_id = parser_input[0]
         dev_id = dev_id[:dev_id.find(',')]
         comand.add_dev(dev_id)
-        err = wait_for_limit(sock, dev_id)
         logger.info('Dev id now = ' + dev_id)
-    if err == 'error':
+        err = wait_for_limit(sock, dev_id)
+    if len(err):
+        sock.close()
         return
     if len(parser_input) >= 2:
         comand = Comand(parser_input)
