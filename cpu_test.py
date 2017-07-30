@@ -15,7 +15,7 @@ def test():
                     p = psutil.Process(a)
                     cpu_lvl = p.cpu_percent(interval=1)
                     if cpu_lvl >= cpu:
-                        report.write("Cpu = " + cpu_lvl + " date and time = " + str(datetime.datetime.now()) + "\n")
+                        report.write("Cpu = " + str(cpu_lvl) + " date and time = " + str(datetime.datetime.now()) + "\n")
         time.sleep(60)
         report.close()
 
