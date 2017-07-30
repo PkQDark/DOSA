@@ -6,3 +6,4 @@ settings.py
 /.idea/
 celerybeat-schedule
 */__pycache__/*
+
