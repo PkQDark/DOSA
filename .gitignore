@@ -5,3 +5,4 @@ settings.py
 *.pyc
 /.idea/
 celerybeat-schedule
+*/__pycache__/*
