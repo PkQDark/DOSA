@@ -1,20 +1,22 @@
 import psutil
 import time
+import datetime
 
-PROCNAME1 = "celery"
-PROCNAME2 = "rabbitmq"
+PROCNAME = "celery"
 
 
 def test():
-    for i in range(1000):
-        time.sleep(3)
+    cpu = 5.0
+    report = open("cpu_report.txt", "w")
+    while cpu <= 100.0:
         for proc in psutil.process_iter():
-            if proc.name() == (PROCNAME1 or PROCNAME2):
-                a = proc.pid
-                p = psutil.Process(a)
-                print(proc.name())
-                print(p.cpu_percent(interval=1))
-                print(p.cpu_affinity())
-
+            if proc.name() == PROCNAME:
+                    a = proc.pid
+                    p = psutil.Process(a)
+                    cpu_lvl = p.cpu_percent(interval=1)
+                    if cpu_lvl >= cpu:
+                        report.write("Name process " + p.name() + " cpu = " + cpu_lvl + " date and time = " + str(datetime.datetime.now()) + "\n")
+        time.sleep(60)
+    report.close()
 
 test()
