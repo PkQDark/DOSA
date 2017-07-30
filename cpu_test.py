@@ -16,3 +16,6 @@ def test():
                 print(p.status)
                 print(p.cpu_percent(interval=1))
                 print(p.cpu_affinity())
+
+
+test()
