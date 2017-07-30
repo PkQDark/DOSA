@@ -4,3 +4,4 @@ worker.log
 settings.py
 *.pyc
 /.idea/
+celerybeat-schedule
