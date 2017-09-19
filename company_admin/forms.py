@@ -71,7 +71,7 @@ class CisternForm(ModelForm):
 
 class AddUpDosedForm(forms.Form):
     volume = forms.DecimalField(widget=forms.NumberInput(attrs={'class': 'form-control', 'required': True}),
-                                max_digits=7, decimal_places=2, min_value=0.0, required=False)
+                                max_digits=7, decimal_places=2, required=False)
     comment = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control'}), required=False)
 
 
